@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+transformers
+torch
+scikit-learn
+nltk
+spacy
+tensorflow
+keras
+numpy
+pandas
+pydantic
+python-multipart
+lime
+matplotlib
+seaborn
+plotly

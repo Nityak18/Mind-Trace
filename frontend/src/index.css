@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@theme {
+  --animate-gradient: gradient 3s ease infinite;
+
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text-primary font-sans antialiased;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-[rgba(255,255,255,0.035)] border border-[rgba(255,255,255,0.07)] backdrop-blur-[16px] shadow-glass rounded-[20px] transition-all duration-250 ease-in-out;
+  }
+  
+  .glass-card:hover {
+    @apply border-[rgba(124,106,247,0.35)] shadow-[0_0_0_1px_rgba(124,106,247,0.2),0_8px_32px_rgba(0,0,0,0.3)];
+  }
+
+  .btn-primary {
+    @apply bg-primary rounded-[12px] text-white px-6 py-3 font-semibold transition-all hover:opacity-90;
+  }
+
+  .btn-gradient {
+    @apply bg-gradient-to-r from-primary to-secondary text-white rounded-[14px] px-6 py-3 font-semibold transition-all hover:shadow-[0_0_20px_rgba(124,106,247,0.6)] hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply border border-border text-text-primary rounded-[12px] px-6 py-3 font-semibold transition-all hover:bg-[rgba(255,255,255,0.05)] hover:border-primary/50;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent;
+  }
+}
+
+.duration-250 {
+  transition-duration: 250ms;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1117; 
+}
+::-webkit-scrollbar-thumb {
+  background: #1e2536; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a5568; 
+}
