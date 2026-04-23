@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, X, ShieldAlert, Loader2 } from 'lucide-react';
+import { Phone, X, ShieldAlert, Loader2, Mic, Sparkles, Music, Pause, Waves } from 'lucide-react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -20,6 +20,66 @@ const Analyzer = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [dismissBanner, setDismissBanner] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isZenPlaying, setIsZenPlaying] = useState(false);
+  const [audio] = useState(new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')); // Using a placeholder, real rain URL would be better
+
+  const toggleZen = () => {
+    if (isZenPlaying) {
+      audio.pause();
+    } else {
+      audio.loop = true;
+      audio.volume = 0.4;
+      audio.play();
+    }
+    setIsZenPlaying(!isZenPlaying);
+  };
+
+  const PROMPTS = [
+    "Write about one thing that went better than expected today.",
+    "What is something you're looking forward to this week?",
+    "Describe a moment today when you felt truly at peace.",
+    "If you could talk to your future self, what would you say?",
+    "What is a challenge you overcame recently, no matter how small?",
+    "List three things you are grateful for right now.",
+    "How does your body feel in this exact moment?"
+  ];
+
+  const getRandomPrompt = () => {
+    const randomPrompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
+    setText(randomPrompt);
+  };
+
+  // Speech Recognition Setup
+  const toggleListening = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice input is not supported in this browser.");
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map(result => result[0])
+        .map(result => result.transcript)
+        .join('');
+      setText(transcript);
+    };
+
+    recognition.start();
+  };
 
   const handleAnalyze = async () => {
     if (!text.trim()) return;
@@ -58,14 +118,33 @@ const Analyzer = () => {
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-10">
       
-      {/* Input Section */}
-      <motion.div className="glass-card flex flex-col overflow-hidden">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Share how you're feeling..."
-          className="w-full bg-transparent border-none resize-none outline-none text-lg p-8 min-h-[180px] text-text-primary placeholder:text-text-muted"
-        />
+      <motion.div className="glass-card flex flex-col overflow-hidden relative">
+        <div className="relative">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Share how you're feeling..."
+            className="w-full bg-transparent border-none resize-none outline-none text-lg p-8 min-h-[180px] text-text-primary placeholder:text-text-muted"
+          />
+          
+          {/* Voice to Text Button */}
+          <div className="absolute bottom-4 right-4 flex gap-2">
+            <button 
+              onClick={getRandomPrompt}
+              className="px-4 py-2 rounded-xl bg-secondary/10 text-secondary hover:bg-secondary/20 text-xs font-bold transition-all flex items-center gap-2"
+              title="Give me a journaling prompt"
+            >
+              <Sparkles className="w-3 h-3" /> Try a prompt
+            </button>
+            <button 
+              onClick={toggleListening}
+              className={`p-3 rounded-full transition-all duration-300 ${isListening ? 'bg-danger text-white animate-pulse shadow-[0_0_15px_rgba(231,76,60,0.5)]' : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
+              title={isListening ? "Stop Listening" : "Speak your mind"}
+            >
+              {isListening ? <X className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
         
         <div className="h-[1px] bg-white/5 w-full" />
         

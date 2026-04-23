@@ -65,21 +65,30 @@ const Dashboard = () => {
   const pieData = Object.entries(conditionCounts).map(([name, value]) => ({ name, value }));
 
   return (
-    <div className="flex flex-col gap-8 pb-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="flex flex-col gap-8 pb-10 print:p-0 print:gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 print:mb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Insights & History</h1>
-          <p className="text-text-secondary text-sm">Track your emotional patterns and daily consistency.</p>
+          <h1 className="text-3xl font-bold mb-2 print:text-black print:text-4xl">Insights & History</h1>
+          <p className="text-text-secondary text-sm print:text-gray-600">Confidential Mental Health Pattern Summary — MindSense AI</p>
         </div>
 
-        {/* Streak Counter */}
-        <div className="bg-primary/10 border border-primary/20 rounded-2xl px-6 py-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-            <Activity className="w-6 h-6 animate-pulse" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-primary">{streak} Days</div>
-            <div className="text-[11px] uppercase tracking-wider text-text-secondary font-bold">Current Daily Streak</div>
+        <div className="flex items-center gap-4 print:hidden">
+          <button 
+            onClick={() => window.print()}
+            className="btn-ghost flex items-center gap-2 text-sm py-2"
+          >
+            <Activity className="w-4 h-4" /> Download Report
+          </button>
+          
+          {/* Streak Counter */}
+          <div className="bg-primary/10 border border-primary/20 rounded-2xl px-6 py-4 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+              <Activity className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-primary">{streak} Days</div>
+              <div className="text-[11px] uppercase tracking-wider text-text-secondary font-bold">Current Daily Streak</div>
+            </div>
           </div>
         </div>
       </div>
