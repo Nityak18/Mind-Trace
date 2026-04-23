@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, X, ShieldAlert, Loader2, Mic, Sparkles, Music, Pause, Waves } from 'lucide-react';
 import axios from 'axios';
@@ -23,6 +23,12 @@ const Analyzer = () => {
   const [isListening, setIsListening] = useState(false);
   const [isZenPlaying, setIsZenPlaying] = useState(false);
   const [audio] = useState(new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')); // Using a placeholder, real rain URL would be better
+
+  useEffect(() => {
+    return () => {
+      audio.pause();
+    };
+  }, [audio]);
 
   const toggleZen = () => {
     if (isZenPlaying) {
@@ -249,22 +255,40 @@ const Analyzer = () => {
                 </div>
 
                 {/* AI Feedback & Solutions */}
-                <div className="bg-primary/5 border border-primary/10 rounded-2xl p-6">
-                  <h4 className="text-primary font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    Empathetic Support
-                  </h4>
-                  <p className="text-text-primary text-lg mb-4 italic leading-relaxed">
-                    "{result.feedback}"
-                  </p>
-                  <div className="space-y-2">
-                    {result.recommendations?.map((tip, i) => (
-                      <div key={i} className="flex gap-2 text-sm text-text-secondary">
-                        <span className="text-primary">•</span>
-                        {tip}
-                      </div>
-                    ))}
+                <div className="bg-primary/5 border border-primary/10 rounded-2xl p-6 relative overflow-hidden">
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-primary font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        Empathetic Support
+                      </h4>
+                      <button 
+                        onClick={toggleZen}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isZenPlaying ? 'bg-secondary text-surface' : 'bg-secondary/10 text-secondary hover:bg-secondary/20'}`}
+                      >
+                        {isZenPlaying ? <Pause className="w-3 h-3" /> : <Waves className="w-3 h-3" />}
+                        {isZenPlaying ? "Stop Zen" : "Start Zen Mode"}
+                      </button>
+                    </div>
+                    <p className="text-text-primary text-lg mb-4 italic leading-relaxed">
+                      "{result.feedback}"
+                    </p>
+                    <div className="space-y-2">
+                      {result.recommendations?.map((tip, i) => (
+                        <div key={i} className="flex gap-2 text-sm text-text-secondary">
+                          <span className="text-primary">•</span>
+                          {tip}
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                  {isZenPlaying && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.1 }}
+                      className="absolute inset-0 z-0 bg-secondary pointer-events-none"
+                    />
+                  )}
                 </div>
               </div>
 
