@@ -2,69 +2,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Brain, ShieldCheck, BarChart2, CheckCircle2 } from 'lucide-react';
+import { BrainHero } from '../components/ui/BrainHero';
 
 const Home = () => {
   return (
     <div className="flex flex-col gap-32 pb-20">
       {/* Hero Section */}
-      <section className="min-h-[calc(100vh-140px)] flex flex-col justify-center items-center text-center mt-10 md:mt-0">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="bg-primary/10 border border-primary/20 text-primary uppercase text-[12px] font-bold tracking-[0.04em] py-1.5 px-4 rounded-full mb-8 inline-block"
-        >
-          AI-Powered Mental Health Insights
-        </motion.div>
-
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-4xl md:text-[56px] leading-[1.1] font-bold tracking-tight mb-6 max-w-4xl"
-        >
-          Understand Your Emotional State with <span className="text-gradient">MindSense</span>
-        </motion.h1>
-
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-lg text-text-secondary max-w-[520px] mx-auto mb-10 leading-relaxed"
-        >
-          Detect patterns of depression, anxiety, stress, and more from your daily inputs using state-of-the-art NLP models within seconds.
-        </motion.p>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
-        >
-          <Link to="/analyzer" className="btn-primary w-full sm:w-auto h-[52px] flex items-center justify-center">
-            Analyze Your Text
-          </Link>
-          <Link to="/about" className="btn-ghost w-full sm:w-auto h-[52px] flex items-center justify-center">
-            Learn How It Works
-          </Link>
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="flex flex-wrap justify-center gap-6 md:gap-10"
-        >
-          {[
-            "3 ML Models", "Instant Analysis", "100% Private"
-          ].map((feature, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-text-secondary font-medium">
-              <CheckCircle2 className="w-4 h-4 text-secondary" />
-              {feature}
-            </div>
-          ))}
-        </motion.div>
-      </section>
+      <BrainHero />
 
       {/* Features Section */}
       <section>
