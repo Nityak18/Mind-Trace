@@ -27,7 +27,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isDark, setIsDark }) => {
     <nav
       className={`sticky top-0 h-screen shrink-0 border-r border-white/5 transition-all duration-300 ease-in-out ${
         open ? "w-64" : "w-20"
-      } bg-surface-elevated flex flex-col shadow-xl z-50`}
+      } bg-surface-elevated flex flex-col shadow-xl z-[60] print:hidden`}
     >
       <TitleSection open={open} />
 

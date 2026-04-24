@@ -35,11 +35,50 @@ const About = () => {
           </div>
         </div>
 
+        {/* System Architecture (Resume Showcase) */}
+        <section>
+          <div className="flex items-center gap-3 mb-8">
+            <ShieldAlert className="w-6 h-6 text-secondary" />
+            <h2 className="text-2xl font-bold">System Architecture</h2>
+          </div>
+          
+          <div className="relative p-8 bg-surface/30 border border-white/5 rounded-3xl overflow-hidden">
+             {/* Simple Visual Flow */}
+             <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+                <div className="flex-1 text-center p-4 bg-primary/10 rounded-2xl border border-primary/20">
+                   <div className="text-[10px] uppercase font-bold text-primary mb-1">Frontend</div>
+                   <div className="text-sm font-bold">React 19 / TS</div>
+                </div>
+                <div className="w-8 h-[2px] bg-white/10 hidden md:block" />
+                <div className="flex-1 text-center p-4 bg-secondary/10 rounded-2xl border border-secondary/20">
+                   <div className="text-[10px] uppercase font-bold text-secondary mb-1">API Layer</div>
+                   <div className="text-sm font-bold">FastAPI / Uvicorn</div>
+                </div>
+                <div className="w-8 h-[2px] bg-white/10 hidden md:block" />
+                <div className="flex-1 text-center p-4 bg-tertiary/10 rounded-2xl border border-tertiary/20">
+                   <div className="text-[10px] uppercase font-bold text-tertiary mb-1">ML Engine</div>
+                   <div className="text-sm font-bold">Scikit-Learn / Transformers</div>
+                </div>
+             </div>
+             
+             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-white/5 rounded-2xl text-xs leading-relaxed">
+                   <span className="text-primary font-bold">NLP Pipeline:</span> Text is preprocessed using TF-IDF and specialized tokenizers before being passed to the ensemble of models for multi-dimensional classification.
+                </div>
+                <div className="p-4 bg-white/5 rounded-2xl text-xs leading-relaxed">
+                   <span className="text-secondary font-bold">Explainability:</span> Using LIME (Local Interpretable Model-agnostic Explanations) to map feature influence back to specific linguistic tokens.
+                </div>
+             </div>
+          </div>
+        </section>
+
+        <div className="h-[1px] bg-white/5 w-full" />
+
         {/* How it works */}
         <section>
           <div className="flex items-center gap-3 mb-6">
             <BookOpen className="w-6 h-6 text-primary" />
-            <h2 className="text-2xl font-bold">How the Model Works</h2>
+            <h2 className="text-2xl font-bold">The Model Stack</h2>
           </div>
           <p className="text-text-secondary leading-relaxed mb-4">
             MindSense utilizes Natural Language Processing (NLP) to detect linguistic patterns associated with various mental health conditions. 

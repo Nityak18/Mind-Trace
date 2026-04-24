@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, X, ShieldAlert, Loader2, Mic, Sparkles, Music, Pause, Waves } from 'lucide-react';
+import { Phone, X, ShieldAlert, Loader2, Mic, Sparkles, Music, Pause, Waves, Brain, Activity } from 'lucide-react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -19,6 +19,7 @@ const Analyzer = () => {
   const [selectedModel, setSelectedModel] = useState('DistilBERT');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [analyzedText, setAnalyzedText] = useState('');
   const [dismissBanner, setDismissBanner] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isZenPlaying, setIsZenPlaying] = useState(false);
@@ -99,6 +100,7 @@ const Analyzer = () => {
         model: selectedModel.toLowerCase()
       });
       setResult(response.data);
+      setAnalyzedText(text);
       
       // Save to local storage for Dashboard
       const history = JSON.parse(localStorage.getItem('mindsense_history') || '[]');
@@ -122,32 +124,40 @@ const Analyzer = () => {
   const showBanner = result && ['High', 'Severe'].includes(result.severity) && !dismissBanner;
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col gap-10">
+    <div className={`max-w-4xl mx-auto flex flex-col gap-10 ${showBanner ? 'pb-32' : 'pb-10'}`}>
       
-      <motion.div className="glass-card flex flex-col overflow-hidden relative">
+      <div className="glass-card flex flex-col overflow-hidden relative">
         <div className="relative">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Share how you're feeling..."
-            className="w-full bg-transparent border-none resize-none outline-none text-lg p-8 min-h-[180px] text-text-primary placeholder:text-text-muted"
+            className="w-full bg-transparent border-none resize-none outline-none text-lg p-8 pb-16 min-h-[220px] text-text-primary placeholder:text-text-muted"
           />
           
-          {/* Voice to Text Button */}
-          <div className="absolute bottom-4 right-4 flex gap-2">
+          {/* Voice to Text Button - Improved Positioning */}
+          <div className="absolute bottom-6 right-6 flex items-center gap-3 bg-surface/80 backdrop-blur-md p-1.5 rounded-2xl border border-white/5 shadow-xl">
             <button 
               onClick={getRandomPrompt}
-              className="px-4 py-2 rounded-xl bg-secondary/10 text-secondary hover:bg-secondary/20 text-xs font-bold transition-all flex items-center gap-2"
+              className="px-4 py-2 rounded-xl bg-secondary/10 text-secondary hover:bg-secondary/20 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2"
               title="Give me a journaling prompt"
             >
               <Sparkles className="w-3 h-3" /> Try a prompt
             </button>
             <button 
+              onClick={toggleZen}
+              className={`p-2.5 rounded-xl transition-all duration-300 ${isZenPlaying ? 'bg-secondary text-surface shadow-[0_0_15px_rgba(78,205,196,0.4)]' : 'bg-secondary/10 text-secondary hover:bg-secondary/20'}`}
+              title={isZenPlaying ? "Stop Zen Mode" : "Start Zen Mode"}
+            >
+              {isZenPlaying ? <Pause className="w-4 h-4" /> : <Waves className="w-4 h-4" />}
+            </button>
+            <div className="w-[1px] h-4 bg-white/10" />
+            <button 
               onClick={toggleListening}
-              className={`p-3 rounded-full transition-all duration-300 ${isListening ? 'bg-danger text-white animate-pulse shadow-[0_0_15px_rgba(231,76,60,0.5)]' : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
+              className={`p-2.5 rounded-xl transition-all duration-300 ${isListening ? 'bg-danger text-white animate-pulse' : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
               title={isListening ? "Stop Listening" : "Speak your mind"}
             >
-              {isListening ? <X className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              {isListening ? <X className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -191,7 +201,7 @@ const Analyzer = () => {
             <motion.div animate={{ scale: [1,1.5,1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-3 h-3 rounded-full bg-primary" />
           </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Results Section */}
       <AnimatePresence>
@@ -215,46 +225,95 @@ const Analyzer = () => {
                     borderColor: SEVERITY_COLORS[result.severity]?.border
                   }}
                 >
-                  {result.prediction} — {result.severity}
+                  {result?.prediction || 'General Pattern'} — {result?.severity || 'Normal'}
                 </motion.div>
                 <div className="text-sm text-text-secondary mt-1">
                   Confidence Score: <span className="text-text-primary font-semibold">{Math.round(result.confidence * 100)}%</span>
                 </div>
               </div>
 
-              <div className="w-full sm:w-[200px]">
-                <div className="flex text-xs justify-between mb-2 text-text-secondary">
-                  <span>Confidence</span>
-                  <span>{Math.round(result.confidence * 100)}%</span>
+              <div className="w-full sm:w-[240px] bg-white/5 p-4 rounded-2xl border border-white/5">
+                <div className="flex text-[10px] uppercase font-black tracking-widest justify-between mb-3 text-text-secondary">
+                  <span>Probability Metric</span>
+                  <span className="text-primary">{Math.round((result?.confidence || 0) * 100)}%</span>
                 </div>
-                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }} 
-                    animate={{ width: `${result.confidence * 100}%` }} 
+                    animate={{ width: `${(result?.confidence || 0) * 100}%` }} 
                     transition={{ duration: 1, ease: 'easeOut' }}
-                    className="h-full bg-primary"
+                    className="h-full bg-gradient-to-r from-primary to-secondary"
                   />
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-              {/* LIME Breakdown */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4 border-b border-white/5 pb-2">Analysis Breakdown</h3>
-                <p className="text-text-secondary mb-4 text-sm">Key words influencing the model's prediction:</p>
-                <div className="bg-surface p-4 rounded-xl font-mono text-[15px] leading-relaxed border border-white/5 mb-8">
-                  {text.split(' ').map((word, i) => {
-                    const isTrigger = result.lime_explanation.some(w => word.toLowerCase().includes(w.toLowerCase()));
-                    return (
-                      <span key={i} className={isTrigger ? "bg-danger/20 text-danger px-1 rounded mx-[1px]" : "mx-[2px]"}>
-                        {word}
-                      </span>
-                    );
-                  })}
+              {/* Advanced Neural Mapping (Explainability) */}
+              <div className="lg:col-span-2">
+                <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-sm">
+                    🧠
+                  </div>
+                  Neural Language Mapping
+                </h3>
+                
+                <div className="relative group p-8 rounded-3xl bg-surface/30 border border-white/5 overflow-hidden min-h-[160px]">
+                  {/* Neural Scan Line Animation */}
+                  <motion.div 
+                    initial={{ top: -100 }}
+                    animate={{ top: ['0%', '100%', '0%'] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent z-0 pointer-events-none shadow-[0_0_20px_rgba(124,106,247,0.5)]"
+                  />
+                  
+                  <div className="relative z-10 flex flex-wrap gap-x-2 gap-y-3 leading-relaxed text-lg">
+                    {analyzedText.split(' ').map((word, i) => {
+                      const cleanWord = word.toLowerCase().replace(/[^a-z0-9]/g, "");
+                      // Robust null check for lime_explanation
+                      const explanation = result?.lime_explanation?.find(w => 
+                        typeof w === 'string' && cleanWord.includes(w.toLowerCase())
+                      );
+                      const isTrigger = !!explanation;
+                      
+                      return (
+                        <motion.span 
+                          key={i}
+                          initial={{ opacity: 0, filter: 'blur(10px)' }}
+                          animate={{ opacity: 1, filter: 'blur(0px)' }}
+                          transition={{ delay: i * 0.02 }}
+                          className={`px-2 py-0.5 rounded-lg transition-all cursor-default relative group/word ${
+                            isTrigger 
+                            ? "bg-danger/10 text-danger font-bold border border-danger/20 shadow-[0_0_10px_rgba(231,76,60,0.1)]" 
+                            : "text-text-secondary"
+                          }`}
+                        >
+                          {word}
+                          {isTrigger && (
+                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-elevated border border-white/10 text-[10px] py-1 px-2 rounded opacity-0 group-hover/word:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-xl pointer-events-none uppercase tracking-tighter">
+                              Model Trigger: High Impact
+                            </span>
+                          )}
+                          {isTrigger && (
+                            <motion.span 
+                              animate={{ opacity: [0.1, 0.3, 0.1] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                              className="absolute inset-0 bg-danger/20 blur-md rounded-lg -z-10"
+                            />
+                          )}
+                        </motion.span>
+                      );
+                    })}
+                  </div>
                 </div>
+                <p className="mt-4 text-[11px] text-text-muted uppercase tracking-[0.2em] font-bold">
+                  * Highlighted areas represent linguistic patterns with the highest diagnostic influence
+                </p>
+              </div>
 
-                {/* AI Feedback & Solutions */}
+              {/* AI Feedback & Solutions */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4 border-b border-white/5 pb-2">Cognitive Insight</h3>
                 <div className="bg-primary/5 border border-primary/10 rounded-2xl p-6 relative overflow-hidden">
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-3">
@@ -262,16 +321,9 @@ const Analyzer = () => {
                         <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                         Empathetic Support
                       </h4>
-                      <button 
-                        onClick={toggleZen}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isZenPlaying ? 'bg-secondary text-surface' : 'bg-secondary/10 text-secondary hover:bg-secondary/20'}`}
-                      >
-                        {isZenPlaying ? <Pause className="w-3 h-3" /> : <Waves className="w-3 h-3" />}
-                        {isZenPlaying ? "Stop Zen" : "Start Zen Mode"}
-                      </button>
                     </div>
                     <p className="text-text-primary text-lg mb-4 italic leading-relaxed">
-                      "{result.feedback}"
+                      "{result?.feedback || 'Analysis complete. Review your insights below.'}"
                     </p>
                     <div className="space-y-2">
                       {result.recommendations?.map((tip, i) => (
@@ -292,29 +344,53 @@ const Analyzer = () => {
                 </div>
               </div>
 
-              {/* Probabilities Chart */}
+              {/* Probabilities Matrix */}
               <div>
-                <h3 className="text-lg font-semibold mb-4 border-b border-white/5 pb-2">Probabilities</h3>
-                <div className="h-[200px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      layout="vertical"
-                      data={Object.entries(result.probabilities).map(([name, val]) => ({ name, value: Math.round(val * 100) })).sort((a,b)=>b.value - a.value)}
-                      margin={{ top: 0, right: 20, left: 20, bottom: 0 }}
-                    >
-                      <XAxis type="number" hide />
-                      <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 13 }} width={80} />
-                      <Tooltip
-                        cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                        contentStyle={{ backgroundColor: '#1e2536', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                      />
-                      <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16}>
-                        {Object.entries(result.probabilities).map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index === 0 ? '#7c6af7' : '#4ecdc4'} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                <h3 className="text-lg font-semibold mb-4 border-b border-white/5 pb-2 text-primary uppercase tracking-widest text-xs">Probabilistic Matrix</h3>
+                <div className="bg-surface/50 p-6 rounded-3xl border border-white/5">
+                  <div className="h-[240px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        layout="vertical"
+                        data={Object.entries(result?.probabilities || {}).map(([name, val]) => ({ 
+                          name, 
+                          value: Math.round((val as number || 0) * 100),
+                          full: 100
+                        })).sort((a,b)=>b.value - a.value)}
+                        margin={{ top: 0, right: 30, left: 20, bottom: 0 }}
+                      >
+                        <XAxis type="number" hide />
+                        <YAxis 
+                          dataKey="name" 
+                          type="category" 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fill: '#edf2f7', fontSize: 11, fontWeight: 700 }} 
+                          width={100} 
+                        />
+                        <Tooltip
+                          cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                          contentStyle={{ backgroundColor: '#161b27', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px' }}
+                        />
+                        <Bar dataKey="value" radius={[0, 8, 8, 0]} barSize={12}>
+                          {Object.entries(result?.probabilities || {}).map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={index === 0 ? '#7c6af7' : 'rgba(124,106,247,0.3)'} 
+                              className="filter drop-shadow-[0_0_8px_rgba(124,106,247,0.5)]"
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex justify-between items-center mt-6 p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                     <div className="flex flex-col">
+                        <span className="text-[10px] text-text-muted uppercase tracking-widest">Model Fidelity</span>
+                        <span className="text-sm font-bold text-text-primary">High Accuracy Mode</span>
+                     </div>
+                     <span className="text-lg animate-pulse">⚡</span>
+                  </div>
                 </div>
               </div>
             </div>
