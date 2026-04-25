@@ -23,21 +23,18 @@ const Analyzer = () => {
   const [dismissBanner, setDismissBanner] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isZenPlaying, setIsZenPlaying] = useState(false);
-  const [audio] = useState(new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')); // Using a placeholder, real rain URL would be better
-
-  useEffect(() => {
-    return () => {
-      audio.pause();
-    };
-  }, [audio]);
+  const audioRef = React.useRef<HTMLAudioElement>(null);
 
   const toggleZen = () => {
+    if (!audioRef.current) return;
+    
     if (isZenPlaying) {
-      audio.pause();
+      audioRef.current.pause();
     } else {
-      audio.loop = true;
-      audio.volume = 0.4;
-      audio.play();
+      audioRef.current.load(); // Force reload the source
+      audioRef.current.loop = true;
+      audioRef.current.volume = 1.0;
+      audioRef.current.play().catch(e => console.error("Audio play failed:", e));
     }
     setIsZenPlaying(!isZenPlaying);
   };
@@ -125,6 +122,11 @@ const Analyzer = () => {
 
   return (
     <div className={`max-w-4xl mx-auto flex flex-col gap-10 ${showBanner ? 'pb-32' : 'pb-10'}`}>
+      <audio 
+        ref={audioRef} 
+        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3" 
+        preload="auto"
+      />
       
       <div className="glass-card flex flex-col overflow-hidden relative">
         <div className="relative">
@@ -149,7 +151,7 @@ const Analyzer = () => {
               className={`p-2.5 rounded-xl transition-all duration-300 ${isZenPlaying ? 'bg-secondary text-surface shadow-[0_0_15px_rgba(78,205,196,0.4)]' : 'bg-secondary/10 text-secondary hover:bg-secondary/20'}`}
               title={isZenPlaying ? "Stop Zen Mode" : "Start Zen Mode"}
             >
-              {isZenPlaying ? <Pause className="w-4 h-4" /> : <Waves className="w-4 h-4" />}
+              {isZenPlaying ? <Pause className="w-4 h-4" /> : <Music className="w-4 h-4" />}
             </button>
             <div className="w-[1px] h-4 bg-white/10" />
             <button 
