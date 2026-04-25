@@ -14,6 +14,12 @@ const SEVERITY_COLORS = {
   Severe: { bg: '#3b1515', text: '#e74c3c', border: 'rgba(231,76,60,0.25)' }
 };
 
+const ZEN_TRACKS = [
+  { name: "Nature Calming", url: "https://cdn.pixabay.com/audio/2025/03/08/audio_f81fcb1303.mp3" },
+  { name: "Soothing Jazz", url: "https://cdn.pixabay.com/audio/2024/09/22/audio_5dde11840b.mp3" },
+  { name: "Soothing Flute", url: "https://cdn.pixabay.com/audio/2025/09/08/audio_00bdcd3cd6.mp3" }
+];
+
 const Analyzer = () => {
   const [text, setText] = useState('');
   const [selectedModel, setSelectedModel] = useState('DistilBERT');
@@ -23,6 +29,7 @@ const Analyzer = () => {
   const [dismissBanner, setDismissBanner] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isZenPlaying, setIsZenPlaying] = useState(false);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(2); // Default to Flute as requested
   const audioRef = React.useRef<HTMLAudioElement>(null);
 
   const toggleZen = () => {
@@ -31,12 +38,25 @@ const Analyzer = () => {
     if (isZenPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.load(); // Force reload the source
+      audioRef.current.load();
       audioRef.current.loop = true;
       audioRef.current.volume = 1.0;
       audioRef.current.play().catch(e => console.error("Audio play failed:", e));
     }
     setIsZenPlaying(!isZenPlaying);
+  };
+
+  const changeTrack = (index: number) => {
+    setCurrentTrackIndex(index);
+    if (isZenPlaying && audioRef.current) {
+      audioRef.current.pause();
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.load();
+          audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+        }
+      }, 100);
+    }
   };
 
   const PROMPTS = [
@@ -124,7 +144,7 @@ const Analyzer = () => {
     <div className={`max-w-4xl mx-auto flex flex-col gap-10 ${showBanner ? 'pb-32' : 'pb-10'}`}>
       <audio 
         ref={audioRef} 
-        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3" 
+        src={ZEN_TRACKS[currentTrackIndex].url} 
         preload="auto"
       />
       
@@ -146,6 +166,18 @@ const Analyzer = () => {
             >
               <Sparkles className="w-3 h-3" /> Try a prompt
             </button>
+            <div className="flex bg-surface/50 p-1 rounded-xl border border-white/5 mr-2">
+              {ZEN_TRACKS.map((track, i) => (
+                <button
+                  key={i}
+                  onClick={() => changeTrack(i)}
+                  className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase transition-all ${currentTrackIndex === i ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                  title={`Switch to ${track.name}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
             <button 
               onClick={toggleZen}
               className={`p-2.5 rounded-xl transition-all duration-300 ${isZenPlaying ? 'bg-secondary text-surface shadow-[0_0_15px_rgba(78,205,196,0.4)]' : 'bg-secondary/10 text-secondary hover:bg-secondary/20'}`}
